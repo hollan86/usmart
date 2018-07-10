@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp" ng-controller="appCtr" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        body {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          /* width: 960px; */
+          /* height: 500px; */
+          position: relative;
+        }
+        path.slice{
+            stroke-width:2px;
+        }
+        polyline{
+            opacity: .3;
+            stroke: black;
+            stroke-width: 2px;
+            fill: none;
+        } 
+        svg text.percent{
+            fill:white;
+            text-anchor:middle;
+            font-size:12px;
+        }
+        
+        </style>
+
+    <!-- <script src="controller.js"></script> -->
+    <!-- <script src="require.js"></script> -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="Donut3D.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>    
+    <title>Twitter Consumer App(TCA)</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Twitter Consumer App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <!-- <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li> -->
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+            <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th scope="col">word1: mac (Blue)</th>
+                        <th scope="col">word2: market (Red)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                          <td id="word1"></td>
+                          <td id="word2"></td>
+                        </tr>
+                    </tbody>
+            </table>
+    </div>
+    <!-- <input type="text" ng-model="name">
+    <h3>hello {{name}}!</h3> -->
+    <div class="d-flex justify-content-center" id="piechart"></div>
+
+    <script>
+        var app = angular.module('myApp', []);
+        var Word1 = 0;
+        var Word2 = 0;
+        app.controller('appCtr', function($scope,$http) {
+        var url = "http://localhost:9999/twitter-stream";
+    
+        // $http.get(url)
+        // .then(function(response) {
+        //     console.log(response);
+        // });
+        //fetch(url).
+        
+        $scope.word1 = 0;
+        $scope.word2 = 0;
+        var loc = window.location
+        var wsStart = 'ws://'
+        if (loc.protocol == 'https:'){
+            wsStart == 'wss://'
+        }
+
+        var endpoint = wsStart + loc.host + loc.pathname
+        console.log(endpoint)
+
+        var socket = new WebSocket(endpoint,"echo-protocol")
+
+        socket.onmessage = function(e){
+            console.log('message',e.data)
+            if(e.data == 'apple'){
+                //Word1 = Word1 + 1;
+                $scope.word1 = $scope.word1 + 1;
+                console.log($scope.word1)
+                $('#word1').text($scope.word1)
+                let dat = {
+                    "word1":$scope.word1,
+                    "word2":$scope.word2
+                }
+                Donut3D.transition("quotesDonut", updateData(dat), 130, 100, 30, 0);
+            }
+            else if (e.data == 'market'){
+                //Word2 = Word2 + 1;
+                $scope.word2 = $scope.word2 + 1;
+                $('#word2').text($scope.word2)
+                let dat = {
+                    "word1":$scope.word1,
+                    "word2":$scope.word2
+                }
+                Donut3D.transition("quotesDonut", updateData(dat), 130, 100, 30, 0);
+            }
+        }
+        socket.onopen = function(e){
+            console.log('open',e)
+        }
+        socket.onerror = function(e){
+            console.log('error',e)
+        }
+        socket.onclose = function(e){
+            console.log('close',e)
+        }
+
+        //chart updates!
+        var salesData=[
+            {label:"Basic", color:"#3366CC"},
+            {label:"Plus", color:"#DC3912"},
+            // {label:"Lite", color:"#FF9900"},
+            // {label:"Elite", color:"#109618"},
+            // {label:"Delux", color:"#990099"}
+        ];
+
+        var svg = d3.select("#piechart").append("svg").attr("width",700).attr("height",300);
+
+        //svg.append("g").attr("id","salesDonut");
+        svg.append("g").attr("id","quotesDonut");
+
+        let idat = {
+                    "word1":$scope.word1,
+                    "word2":$scope.word2
+                }
+
+        //Donut3D.draw("salesDonut", randomData(), 150, 150, 130, 100, 30, 0.4);
+        Donut3D.draw("quotesDonut", updateData(idat), 450, 150, 130, 100, 30, 0);
+            
+        /*function changeData(){
+            //Donut3D.transition("salesDonut", randomData(), 130, 100, 30, 0.4);
+            Donut3D.transition("quotesDonut", updateData(), 130, 100, 30, 0);
+        }*/
+
+        function updateData(vdat){
+            let temp =  salesData.map(function(d){ 
+                return {label:d.label, value:1000*Math.random(), color:d.color};
+                
+            });
+            var valIndex1 = temp.map(function(item) { return item.label; }).indexOf("Basic");
+            var valIndex2 = temp.map(function(item) { return item.label; }).indexOf("Plus");
+            temp[valIndex1].value = vdat.word1;
+            temp[valIndex2].value = vdat.word2;
+            return temp;
+        }
+       
+        
+    });
+    </script>
+
+    
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>

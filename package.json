@@ -1,0 +1,17 @@
+{
+  "name": "usmart",
+  "version": "1.0.0",
+  "description": "twitter live stream",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hollan O. Haule",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3",
+    "twit": "^2.2.11",
+    "websocket": "^1.0.26"
+  }
+}
