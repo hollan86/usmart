@@ -14,22 +14,16 @@ var http = require('http');
 
  app.get('/', (req, res) => res.send('public/index.html'))
  app.get('/twitter-stream', (req,res) => {
-    console.log('twitter request');
-    var T = new Twit({
-        consumer_key:         '6vvUfvtWZ7EjVmDhGrfs250a3',
-        consumer_secret:      'qMV1NY0TgfI93FpyQF5hp67KaUzblCuLFnF8ouIQ8LNUViTn4Z',
-        access_token:         '276032007-53CgtLBvWNSzzITSbWvwrYy3FIwqclpJ0snTdIlB',
-        access_token_secret:  'bxMHeisayMUl5QmlKwidtfKFxdDVpewGgJbVJzUIpNILE',
-        timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
-        strictSSL:            true,     // optional - requires SSL certificates to be valid.
-      });
+    // console.log('twitter request');
+    // var config = require('./config');
+    // var T = new Twit(config);
     
-    var stream = T.stream('statuses/filter', { track: '#apple', language: 'en' })
+    // var stream = T.stream('statuses/filter', { track: '#apple', language: 'en' })
     
-    stream.on('tweet', function (tweet) {
-       console.log(tweet);
+    // stream.on('tweet', function (tweet) {
+    //    console.log(tweet);
        
-     })
+    //  })
      
  });
  
@@ -99,6 +93,9 @@ function originIsAllowed(origin) {
     });
     connection.on('close', function(reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+        stream.stop();
+        stream2.stop();
+        // console.log(stream);
     });
 });
 
