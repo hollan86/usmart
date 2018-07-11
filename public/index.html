@@ -136,7 +136,7 @@
         }
 
         //chart updates!
-        var salesData=[
+        var Data=[
             {label:"Basic", color:"#3366CC"},
             {label:"Plus", color:"#DC3912"},
             // {label:"Lite", color:"#FF9900"},
@@ -163,7 +163,7 @@
         }*/
 
         function updateData(vdat){
-            let temp =  salesData.map(function(d){ 
+            let temp =  Data.map(function(d){ 
                 return {label:d.label, value:1000*Math.random(), color:d.color};
                 
             });
