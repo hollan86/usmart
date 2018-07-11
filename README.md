@@ -4,7 +4,7 @@
 
 ### Installing
 
-Clone to repo and then run the command below to install
+Clone the repo and then run the command below to install
 
 ```
 npm install
